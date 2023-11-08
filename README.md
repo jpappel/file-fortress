@@ -5,3 +5,4 @@ A file hosting service
 
 * [JP Appel](https://github.com/jpappel)
 * [Owen Halliday](https://github.com/drekdrek)
+* [David Marrero](https://github.com/badlydrawnface)
