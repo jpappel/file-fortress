@@ -1,6 +1,14 @@
 # file-fortress
 A file hosting service
 
+## Requirements
+
+* [Docker Compose](https://docs.docker.com/compose/install/)
+
+## Installation/Setup
+
+## Usage
+
 ## Contributors
 
 * [JP Appel](https://github.com/jpappel)
