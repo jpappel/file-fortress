@@ -35,3 +35,15 @@ CREATE TABLE permissions (
     FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE
 );
+
+DELIMITER //
+
+CREATE TRIGGER add_owner_permissions
+AFTER INSERT ON files
+FOR EACH ROW
+BEGIN
+    INSERT INTO permissions
+    VALUES (NEW.id, NEW.uploader_id, 'owner');
+END;//
+
+DELIMITER ;
