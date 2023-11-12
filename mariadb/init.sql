@@ -17,6 +17,8 @@ CREATE TABLE files (
     mime_type VARCHAR(31),
     expires DATETIME,
     privacy ENUM('public', 'share', 'private') DEFAULT 'public' NOT NULL,
+    modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     INDEX(uploader_id, mime_type),
     FOREIGN KEY (uploader_id) REFERENCES users(id)
