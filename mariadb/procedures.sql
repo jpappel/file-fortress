@@ -1,5 +1,3 @@
-USE filefort;
-
 DELIMITER //
 
 CREATE OR REPLACE PROCEDURE RemoveExpired (IN p_expire_date DATETIME, OUT p_remove_count INT)

@@ -1,7 +1,3 @@
-CREATE DATABASE filefort;
-
-USE filefort;
-
 CREATE TABLE users (
     id UUID DEFAULT UUID(),
     name VARCHAR(31) NOT NULL,
