@@ -4,5 +4,7 @@ services:
   mariadb:
     build: ./mariadb
     container_name: mariadb
+    environment:
+      - "MARIADB_DATABASE=filefort"
     env_file:
       - mariadb/.env
