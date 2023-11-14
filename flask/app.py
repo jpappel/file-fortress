@@ -1,3 +1,4 @@
+from flask import Flask, jsonify
 import mariadb
 import os
 import time
@@ -25,3 +26,25 @@ while not connected:
            raise TimeoutError("Database connection timeout")
     # Get Cursor
 cur = conn.cursor(dictionary=True)
+
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def main():
+    return '<p>Flask works!</p>'
+    # return render_template('index.html')
+
+
+@app.route('/<short_link>', methods=['GET'])
+def get_file(short_link):
+    cur.execute("SELECT * FROM files WHERE short_link=?", (short_link,))
+    file = cur.fetchone()
+    if not file:
+        return 'file not found', 404
+    return jsonify(file)
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8080)
