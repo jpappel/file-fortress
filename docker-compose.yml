@@ -8,3 +8,12 @@ services:
       - "MARIADB_DATABASE=filefort"
     env_file:
       - mariadb/.env
+
+  flask:
+    build: ./flask
+    ports:
+      - "8080:8080"
+    container_name: flask
+    env_file:
+      - mariadb/.env
+      - flask/.env
