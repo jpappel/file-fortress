@@ -9,4 +9,4 @@ COPY . /app
 WORKDIR /app
 
 # Run the application
-CMD [ "flask", "run", "--host=0.0.0.0", "--port=8080"]
+CMD [ "flask","--app", "src/app", "run", "--host=0.0.0.0", "--port=8080"]
