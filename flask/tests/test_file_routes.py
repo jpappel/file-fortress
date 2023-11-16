@@ -1,9 +1,9 @@
 import pytest
 import uuid
-from app import app
 
+from src.app import app
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def client():
     
     app.config["TESTING"] = True
