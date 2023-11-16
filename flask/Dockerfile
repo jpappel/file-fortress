@@ -1,8 +1,5 @@
 FROM python:3.10
 
-# Install MariaDB client
-RUN apt-get update && apt-get install -y libmariadb3 libmariadb-dev
-
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
