@@ -10,6 +10,7 @@ window.addEventListener('load', function() {
     })
     .then(data => {
         console.log(data);
+        document.getElementById('file').innerHTML = JSON.stringify(data);
     })
     .catch(err => {
         console.error(err);
