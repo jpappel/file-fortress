@@ -4,7 +4,6 @@ from flask import Flask, g, request
 from dbutils.persistent_db import PersistentDB
 from app import app
 import os
-from flask import g
 
 def _connect_db():
     return PersistentDB(
