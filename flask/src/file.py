@@ -1,4 +1,4 @@
-from db import get_db
+from .db import get_db
 
 def get_file(short_link):
     db = get_db().cursor()
@@ -7,4 +7,3 @@ def get_file(short_link):
     if not file:
         return None
     return file
-

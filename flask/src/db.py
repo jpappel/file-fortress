@@ -1,8 +1,7 @@
 # adapted from https://stackoverflow.com/a/48059894/18579223 
 import pymysql
-from flask import Flask, g, request
 from dbutils.persistent_db import PersistentDB
-from app import app
+from .app import app
 import os
 
 def _connect_db():
