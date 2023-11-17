@@ -18,6 +18,11 @@ services:
       - mariadb/.env
       - flask/.env
     volumes:
+      - file_storage:/mnt/file_storage
+
+  nginx:
+    build: ./nginx/
+    volumes:
       - file_storage:/srv/file_storage
 
 
