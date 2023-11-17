@@ -1,4 +1,4 @@
-name: Flask Server
+name: Test flask server
 
 on:
   pull_request:
