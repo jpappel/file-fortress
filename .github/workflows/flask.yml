@@ -1,9 +1,12 @@
 name: Flask Server
 
-on:   
+on:
   pull_request:
     types: [opened, ready_for_review]
-  push
+  push:
+    branches:
+      '**' # all branches
+  
 jobs:
   run_tests:
     runs-on: ubuntu-latest
