@@ -6,7 +6,7 @@ sudo systemctl enable --now docker
 
 # add user to the "docker" group, and start a new shell with the permissions instantiated
 sudo usermod -aG docker ec2-user
-exec su -l ec2-user
+id ec2-user # reloads group assignments without relogging
 
 # install docker compose (which isn't included)
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
