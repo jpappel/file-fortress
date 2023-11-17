@@ -161,3 +161,6 @@ cython_debug/
 
 # MacOS folder stuff
 .DS_Store
+
+# Visual Studio code config
+.vscode/
