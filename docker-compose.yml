@@ -17,3 +17,10 @@ services:
     env_file:
       - mariadb/.env
       - flask/.env
+    volumes:
+      - file_storage:/srv/file_storage
+
+
+volumes:
+  file_storage:
+    name: "file_storage"
