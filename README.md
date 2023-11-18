@@ -23,6 +23,12 @@ Note the default database can be changed from `filefort` via the `MARIADB_DATABA
 
 ## Usage
 
+
+## Testing
+
+* ### Flask
+    Testing of flask uses `pytest` and `pytest-mock`. To run the tests, run `pytest` in the `flask` directory.
+
 ## Contributors
 
 * [JP Appel](https://github.com/jpappel)
