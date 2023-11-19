@@ -74,12 +74,18 @@ class LocalStorageManager(StorageManager):
         return self.root.joinpath(rel_path).as_posix()
 
     def push_file(self, file: bytes, rel_path: str) -> None:
+        """
+        Write bytes to disk at rel_path
+        """
         file_path = self.root.joinpath(rel_path)
         if file_path.exists():
             raise FileExistsError(f'Cannot create file, {rel_path} already exists')
         file_path.write_bytes(file)
 
     def delete_file(self, rel_path: str) -> None:
+        """
+        Delete a file from disk
+        """
         file_path = self.root.joinpath(rel_path)
         file_path.unlink()
 

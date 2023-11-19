@@ -1,16 +1,13 @@
 from .app import app
 from flask import request, jsonify, send_file
-from .file import get_file
 
 from .StorageManagers import LocalStorageManager
 from .db import get_db
 
 
-manager = LocalStorageManager(get_db(), '/mnt/file_storage')
-
-
 @app.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE', 'PUT'])
 def file(short_link):
+    manager = LocalStorageManager(get_db(), '/mnt/file_storage')
     try:
         rel_path =  manager.create_link(short_link) if request.method == 'PUT' else manager.lookup_link(short_link)
     except FileNotFoundError:
@@ -24,7 +21,9 @@ def file(short_link):
             return send_file(path)
         case 'DELETE':
             manager.delete_file(short_link)
-            return
+            cursor = get_db().cursor()
+            cursor.execute('DROP FROM files WHERE short_link = %s', short_link)
+            cursor.commit()
         case 'PUT':
             raise NotImplementedError
 
