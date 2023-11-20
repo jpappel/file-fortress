@@ -7,9 +7,10 @@ from .db import get_db
 
 @app.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE', 'PUT'])
 def file(short_link):
+    print(request.method)
     manager = LocalStorageManager(get_db(), '/mnt/file_storage')
     try:
-        rel_path =  manager.create_link(short_link) if request.method == 'PUT' else manager.lookup_link(short_link)
+        rel_path = manager.create_link(short_link) if request.method == 'PUT' else manager.lookup_link(short_link)
     except FileNotFoundError:
         return jsonify({'error': 'file not found'}), 404
     except FileExistsError:

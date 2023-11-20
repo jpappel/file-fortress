@@ -1,24 +1,27 @@
 import pytest
+from unittest.mock import patch
 import uuid
 
 from src.app import app
 
+
 @pytest.fixture()
 def client():
-    
     app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
 
 
-def test_file_not_found(client,mocker):
+def test_file_not_found(client, mocker):
     # mock the value from get_file
-    mocked_get_file = mocker.patch('src.file_routes.get_file')
-    mocked_get_file.return_value = None
+    with patch(
+        "src.StorageManagers.StorageManager.lookup_link",
+        side_effect=FileNotFoundError(),
+    ):
+        response = client.get("/api/v1/file/test.png")
+        assert response.status_code == 404
+        assert {"error": "file not found"} == response.json
 
-    response = client.get("/api/v1/file/test.png")
-    assert response.status_code == 404
-    assert {'error': 'file not found'} == response.json
 
 def test_file_found(client, mocker):
     #mock the value from get_file
