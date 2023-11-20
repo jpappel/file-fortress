@@ -9,4 +9,4 @@ COPY . /app
 WORKDIR /app
 
 # Run the application
-CMD [ "flask","--app", "src/app", "run", "--host=0.0.0.0", "--port=8080"]
+CMD [ "gunicorn" , "-w", "4", "-b", "0.0.0.0:8080", "src.app:app"]
