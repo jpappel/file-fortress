@@ -1,6 +1,6 @@
 from .app import app
 from flask import request, jsonify, send_file, make_response
-from mimetypes import guess_type as guess_mime_type
+from .util import get_mime_type
 
 from .StorageManagers import LocalStorageManager
 from .db import get_db
@@ -44,7 +44,7 @@ def upload_file(short_link):
     filename = file.filename
     file_info = {
             'short_link': short_link,
-            'mime_type': guess_mime_type(file.filename),
+            'mime_type': get_mime_type(file.read(3072)),
             'privacy': request.args.get('privacy', 'public'),
             }
 
