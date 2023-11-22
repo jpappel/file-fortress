@@ -22,6 +22,15 @@ git clone https://github.com/cs298-398f23/file-fortress
 # create a .env file in flask
 touch file-fortress/flask/.env
 
-# TODO
+# create environment variables for mariadb
+# randomly generate root password
+echo "mariadb_root_password=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-10000)/")" >> file-fortress/mariadb/.env
+
+# randomly generate user name
+echo "mariadb_user=$(grep '.\{6\}' /usr/share/dict/words | shuf -n 1)" >> file-fortress/mariadb/.env
+
+# randomly generate user password
+echo "mariadb_password=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-5000)/")" >> file-fortress/mariadb/.env
+
 # launch the container in the background
-# cd file-fortress && docker compose up -d
+cd file-fortress && docker compose up -d
