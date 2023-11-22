@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 import uuid
 
 from src.app import app
@@ -15,9 +14,42 @@ def client():
 def test_file_not_found(client, mocker):
     # mock the value from get_file
     app.db = mocker.MagicMock()
-    response = client.get("/api/v1/file/test.png")
+    response = client.get("/api/v1/file/test")
     assert response.status_code == 404
     assert {"error": "file not found"} == response.json
+
+
+def test_delete_non_existing_file(client, mocker):
+    app.db = mocker.MagicMock()
+    response = client.delete('/api/v1/file/test')
+    assert response.status_code == 404
+    assert {"error": "file not found"} == response.json
+
+
+def test_upload_missing_file(client, mocker):
+    app.db = mocker.MagicMock()
+    response = client.post('/api/v1/file/test.png')
+    assert response.status_code == 400
+    assert response.json == {'error': 'no file provided'}
+
+
+@pytest.mark.skip(reason="storage manager and db not mocked")
+def test_upload_file(client, mocker, tmpdir):
+    # mock components
+    app.db = mocker.MagicMock()
+
+    # create dummy test file
+    p = tmpdir.mkdir('test')/'test.txt'
+    p.write("testing body")
+
+    # setup request
+    files = {'file': ('test.txt', open(p, 'r'))}
+    params = {'privacy': 'public', 'expires': 1700824992}
+
+    response = client.post('/api/v1/file/test', files=files, params=params)
+
+    assert response.status_code == 200
+    assert response.json == {'success': 'file uploaded succesfully'}
 
 
 @pytest.mark.skip(reason="not sure how to make this mock yet")
