@@ -5,6 +5,7 @@ A file hosting service
 ## Requirements
 
 * [Docker Compose](https://docs.docker.com/compose/install/)
+* [Libmagic](https://pypi.org/project/python-magic), instructions are under the `Installation` section
 
 ## Installation/Setup
 

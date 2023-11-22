@@ -1,32 +1,97 @@
 from .app import app
-from flask import request, jsonify, send_file
+from flask import request, jsonify, send_file, make_response
+from .util import get_mime_type
 
 from .StorageManagers import LocalStorageManager
 from .db import get_db
 
 
-@app.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
+           provide_automatic_options=False)
 def file(short_link):
-    print(request.method)
+    # TODO: add manager as app attribute
     manager = LocalStorageManager(get_db(), '/mnt/file_storage')
     try:
-        rel_path = manager.create_link(short_link) if request.method == 'PUT' else manager.lookup_link(short_link)
+        rel_path = manager.lookup_link(short_link)
     except FileNotFoundError:
         return jsonify({'error': 'file not found'}), 404
-    except FileExistsError:
-        return jsonify({'error': 'a file already exits at this location'}), 404
 
     match request.method:
         case 'GET':
             path = manager.cannonical_location(rel_path)
             return send_file(path)
         case 'DELETE':
-            manager.delete_file(short_link)
+            manager.delete_file(rel_path)
             cursor = get_db().cursor()
-            cursor.execute('DROP FROM files WHERE short_link = %s', short_link)
-            cursor.commit()
-        case 'PUT':
-            raise NotImplementedError
+            cursor.execute('DELETE FROM files WHERE short_link = %s', short_link)
+            get_db().commit()
+            return {}, 204
+
+
+@app.route('/api/v1/file/<short_link>', methods=['POST'],
+           provide_automatic_options=False)
+def upload_file(short_link):
+    if 'file' not in request.files:
+        return jsonify({'error': 'no file provided'}), 400
+
+    # NOTE: any form is required to have
+    # <input type="file" name="file"></input>
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'empty file provided'}), 400
+
+    filename = file.filename
+    file_info = {
+            'short_link': short_link,
+            'mime_type': get_mime_type(file.read(3072)),
+            'privacy': request.args.get('privacy', 'public'),
+            }
+
+    # reset to beginning of file
+    file.seek(0)
+
+    manager = LocalStorageManager(get_db(), '/mnt/file_storage')
+
+    # TODO: change from testing value of system user id
+    file_info['uploader_id'] = manager._system_id
+
+    try:
+        file_info['expires'] = int(request.args.get('expires'))
+    except (ValueError, TypeError):
+        file_info['expires'] = None
+
+    file_info['url'] = manager.allocate_url(file_info['uploader_id'], filename)
+
+    # create link within database
+    manager.create_link(**file_info)
+
+    # save file
+    manager.push_file(file.stream, file_info['url'])
+
+    return jsonify({'success': 'file uploaded succesfully'}), 200
+
+
+@app.route('/api/v1/file/<short_link>', methods=['OPTIONS'],
+           provide_automatic_options=False)
+def link_options(short_link):
+    allowed_methods = ['HEAD', 'OPTIONS']
+
+    # query database for short_link
+    cursor = get_db().cursor()
+    cursor.execute('SELECT id FROM files WHERE short_link = %s', short_link)
+    result = cursor.fetchone()
+
+    # find valid methods
+    if result is None:
+        allowed_methods.append('POST')
+    else:
+        allowed_methods.append('GET')
+        allowed_methods.append('DELETE')
+
+    response = make_response()
+    response.headers['Allow'] = ', '.join(allowed_methods)
+    return response, 204
 
 
 @app.route('/api/v1/file/<short_link>/info', methods=['GET'])
