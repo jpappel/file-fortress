@@ -1,8 +1,15 @@
 import pytest
 from src.StorageManagers import LocalStorageManager
 
+
+class LocalStorageManagerTest(LocalStorageManager):
+    def __init__(self,dict:dict = {}):
+        super().__init__(db_returns(dict), "")
+
+
 class db_returns():
-    def __init__(self,val):
+    def __init__(self,val:dict = {}):
+        val['id'] = 0
         self.val = val
         pass
     def cursor(self):
@@ -17,14 +24,14 @@ class db_returns():
         return self.val
 
 def test_StorageManager():
-    manager = LocalStorageManager(db_returns(None),'')
+    manager = LocalStorageManagerTest()
     
 def test_none_raises_file_not_found():
-    manager = LocalStorageManager(db_returns(None),'')
+    manager = LocalStorageManagerTest()
     with pytest.raises(FileNotFoundError):
         manager.lookup_link('test.png')
 
 def test_lookup_link():
-    manager = LocalStorageManager(db_returns({'url':'test.png'}),'')
+    manager = LocalStorageManagerTest({'url':'test.png'})
     assert manager.lookup_link('test.png') == 'test.png'
 
