@@ -30,10 +30,45 @@ CREATE TABLE permissions (
     file_id INT UNSIGNED,
     user_id UUID,
     permission ENUM('owner', 'viewer'),
+    PRIMARY KEY (file_id, user_id),
     INDEX idx_file (file_id),
     INDEX idx_user (user_id),
     INDEX idx_user_permission (user_id, permission),
     FOREIGN KEY (file_id) REFERENCES files(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE collections (
+    id INT UNSIGNED AUTO_INCREMENT,
+    creator_id UUID,
+    name VARCHAR(255) NOT NULL,
+    expires DATETIME,
+    modified_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
+    created_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
+    PRIMARY KEY (id),
+    INDEX idx_id_creator (id, creator_id),
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+);
+
+CREATE TABLE collection_files (
+    collection_id INT UNSIGNED,
+    file_id INT UNSIGNED,
+    -- TODO: require file has correct permissions
+    FOREIGN KEY (collection_id) REFERENCES collections(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (file_id) REFERENCES files(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE collection_permissions (
+    collection_id INT UNSIGNED,
+    user_id UUID,
+    permission ENUM('owner', 'editor', 'viewer'),
+    PRIMARY KEY (collection_id, user_id),
+    FOREIGN KEY (collection_id) REFERENCES collections(id)
         ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE
@@ -47,6 +82,14 @@ FOR EACH ROW
 BEGIN
     INSERT INTO permissions
     VALUES (NEW.id, NEW.uploader_id, 'owner');
+END;//
+
+CREATE TRIGGER collections_add_owner_permissions
+AFTER INSERT ON collections
+FOR EACH ROW
+BEGIN
+    INSERT INTO collection_permissions
+    VALUES (NEW.id, NEW.creator_id, 'owner');
 END;//
 
 DELIMITER ;
