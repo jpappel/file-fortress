@@ -3,16 +3,22 @@ CREATE TABLE users (
     name VARCHAR(31) NOT NULL,
     -- email VARCHAR(63), -- not needed atm
     upload_limit INT UNSIGNED, -- NULL is no limit
+    collection_limit INT UNSIGNED DEFAULT 31,
+    collection_size_limit INT UNSIGNED DEFAULT 15,
     -- AUTH STUFF
     PRIMARY KEY (id),
     CONSTRAINT check_positive_upload_limit
-        CHECK (upload_limit > 0 OR upload_limit IS NULL)
+        CHECK (upload_limit > 0 OR upload_limit IS NULL),
+    CONSTRAINT check_positive_collection_limit
+        CHECK (collection_limit > 0 OR collection_limit IS NULL),
+    CONSTRAINT check_positive_collection_size_limit
+        CHECK (collection_size_limit > 0 OR collection_size_limit IS NULL)
 );
 
 CREATE TABLE files (
     id INT UNSIGNED AUTO_INCREMENT,
     uploader_id UUID,
-    short_link VARCHAR(255),
+    short_link VARCHAR(255) UNIQUE NOT NULL,
     url VARCHAR(255),
     mime_type VARCHAR(31),
     expires DATETIME,
@@ -43,11 +49,23 @@ CREATE TABLE permissions (
 
 CREATE TABLE collections (
     id INT UNSIGNED AUTO_INCREMENT,
-    creator_id UUID,
     name VARCHAR(255) NOT NULL,
+    creator_id UUID,
+    short_link VARCHAR(255) UNIQUE NOT NULL,
+    url VARCHAR(255) NOT NULL,
     expires DATETIME,
     modified_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
     created_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
+    size_limit INT DEFAULT (
+        SELECT u.collection_size_limit
+        FROM users u
+        WHERE u.id = creator_id
+    ),
+    total_files INT GENERATED ALWAYS AS ((
+            SELECT COUNT(cf.file_id)
+            FROM collection_files cf
+            WHERE cf.collection_id = collections.id
+        )) STORED ,
     PRIMARY KEY (id),
     INDEX idx_id_creator (id, creator_id),
     FOREIGN KEY (creator_id) REFERENCES users(id)
@@ -56,7 +74,6 @@ CREATE TABLE collections (
 CREATE TABLE collection_files (
     collection_id INT UNSIGNED,
     file_id INT UNSIGNED,
-    -- TODO: require file has correct permissions
     FOREIGN KEY (collection_id) REFERENCES collections(id)
         ON DELETE CASCADE,
     FOREIGN KEY (file_id) REFERENCES files(id)
