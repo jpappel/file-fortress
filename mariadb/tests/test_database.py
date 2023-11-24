@@ -7,7 +7,7 @@ options = {
         'host': environ.get('MARIADB_HOST', 'localhost'),
         'port': int(environ.get('MARIADB_PORT', 3306)),
         'user': environ.get('MARIADB_USER'),
-        'password': environ.get('MARIADB_PASSWORD'),
+        'password': environ.get('MARIADB_PASSWORD', 'password'),
         'database': environ.get('MARIADB_DATABASE', 'filefort')
     }
 
