@@ -24,13 +24,13 @@ touch file-fortress/flask/.env
 
 # create environment variables for mariadb
 # randomly generate root password
-echo "mariadb_root_password=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-10000)/")" >> file-fortress/mariadb/.env
+echo "MARIADB_ROOT_PASSWORD=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-10000)/")" >> file-fortress/mariadb/.env
 
 # randomly generate user name
-echo "mariadb_user=$(grep '.\{6\}' /usr/share/dict/words | shuf -n 1)" >> file-fortress/mariadb/.env
+echo "MARIADB_USER=$(grep '.\{6\}' /usr/share/dict/words | shuf -n 1)" >> file-fortress/mariadb/.env
 
 # randomly generate user password
-echo "mariadb_password=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-5000)/")" >> file-fortress/mariadb/.env
+echo "MARIADB_PASSWORD=$(grep '.\{5\}' /usr/share/dict/words | shuf -n 3 | tr -d '\n' | sed "s/$/$(shuf -n1 -i 0-5000)/")" >> file-fortress/mariadb/.env
 
 # launch the container in the background
 cd file-fortress && docker compose up -d
