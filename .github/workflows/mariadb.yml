@@ -16,7 +16,8 @@ jobs:
         env:
           MARIADB_ROOT_PASSWORD: password
           MARIADB_DATABASE: filefort
-          MARIADB_USER: root
+          MARIADB_USER: test_user
+          MARIADB_PASSWORD: password
         ports:
           - 3306:3306
     steps:
@@ -39,4 +40,7 @@ jobs:
           mariadb --protocol=tcp -u root -ppassword filefort < ./procedures.sql
       - name: Test with pytest
         working-directory: ./mariadb/
+        env:
+          MARIADB_USER: test_user
+          MARIADB_PASSWORD: password
         run: pytest
