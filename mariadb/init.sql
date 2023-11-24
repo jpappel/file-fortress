@@ -53,19 +53,11 @@ CREATE TABLE collections (
     creator_id UUID,
     short_link VARCHAR(255) UNIQUE NOT NULL,
     url VARCHAR(255) NOT NULL,
+    privacy ENUM('public', 'share', 'private') DEFAULT 'public' NOT NULL,
     expires DATETIME,
     modified_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
     created_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
-    size_limit INT DEFAULT (
-        SELECT u.collection_size_limit
-        FROM users u
-        WHERE u.id = creator_id
-    ),
-    total_files INT GENERATED ALWAYS AS ((
-            SELECT COUNT(cf.file_id)
-            FROM collection_files cf
-            WHERE cf.collection_id = collections.id
-        )) STORED ,
+    size_limit INT, -- COALESCE should be used when querying this column
     PRIMARY KEY (id),
     INDEX idx_id_creator (id, creator_id),
     FOREIGN KEY (creator_id) REFERENCES users(id)
@@ -78,6 +70,21 @@ CREATE TABLE collection_files (
         ON DELETE CASCADE,
     FOREIGN KEY (file_id) REFERENCES files(id)
         ON DELETE CASCADE
+);
+
+CREATE VIEW collection_size_info AS (
+    SELECT
+        i.id AS collection_id,
+        COALESCE(i.size_limit, (SELECT collection_size_limit FROM users WHERE i.creator_id = users.id LIMIT 1)) AS size_limit,
+        COALESCE(c.total_files, 0) AS total_files
+    FROM
+        (SELECT id, creator_id, size_limit FROM collections) i
+    LEFT JOIN (
+        SELECT collection_id, COUNT(*) AS total_files
+        FROM collection_files
+        GROUP BY collection_id
+    ) c
+    ON i.id = c.collection_id
 );
 
 CREATE TABLE collection_permissions (
