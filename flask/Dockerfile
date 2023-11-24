@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
