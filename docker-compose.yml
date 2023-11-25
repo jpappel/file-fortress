@@ -11,9 +11,26 @@ services:
 
   flask:
     build: ./flask
-    ports:
-      - "8080:8080"
     container_name: flask
+    depends_on:
+      - mariadb
     env_file:
       - mariadb/.env
       - flask/.env
+    volumes:
+      - file_storage:/mnt/file_storage
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - file_storage:/srv/file_storage
+    depends_on:
+      - flask
+
+
+volumes:
+  file_storage:
+    name: "file_storage"
