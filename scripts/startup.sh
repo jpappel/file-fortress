@@ -1,5 +1,5 @@
 # install git and docker in the instance
-sudo dnf in docker git
+sudo dnf in docker git -y
 
 # enable the docker daemon
 sudo systemctl enable --now docker
