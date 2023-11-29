@@ -8,12 +8,18 @@ services:
       - "MARIADB_DATABASE=filefort"
     env_file:
       - mariadb/.env
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
 
   flask:
     build: ./flask
     container_name: flask
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     env_file:
       - mariadb/.env
       - flask/.env
