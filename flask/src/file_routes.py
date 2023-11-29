@@ -1,13 +1,14 @@
-from .app import app
-from flask import request, jsonify, send_file, make_response
+from flask import Blueprint, request, jsonify, send_file, make_response, current_app
 from .util import get_mime_type
 
 from .StorageManagers import LocalStorageManager
 from .db import get_db
 
+file_api = Blueprint('file_api', __name__)
 
-@app.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
-           provide_automatic_options=False)
+
+@file_api.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
+                provide_automatic_options=False)
 def file(short_link):
     # TODO: add manager as app attribute
     manager = LocalStorageManager(get_db(), '/mnt/file_storage')
@@ -28,8 +29,8 @@ def file(short_link):
             return {}, 204
 
 
-@app.route('/api/v1/file/<short_link>', methods=['POST'],
-           provide_automatic_options=False)
+@file_api.route('/api/v1/file/<short_link>', methods=['POST'],
+                provide_automatic_options=False)
 def upload_file(short_link):
     if 'file' not in request.files:
         return jsonify({'error': 'no file provided'}), 400
@@ -72,8 +73,8 @@ def upload_file(short_link):
     return jsonify({'success': 'file uploaded succesfully'}), 200
 
 
-@app.route('/api/v1/file/<short_link>', methods=['OPTIONS'],
-           provide_automatic_options=False)
+@file_api.route('/api/v1/file/<short_link>', methods=['OPTIONS'],
+                provide_automatic_options=False)
 def link_options(short_link):
     allowed_methods = ['HEAD', 'OPTIONS']
 
@@ -94,7 +95,7 @@ def link_options(short_link):
     return response, 204
 
 
-@app.route('/api/v1/file/<short_link>/info', methods=['GET'])
+@file_api.route('/api/v1/file/<short_link>/info', methods=['GET'])
 def file_info(short_link):
     try:
         cursor = get_db().cursor()

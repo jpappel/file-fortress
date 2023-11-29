@@ -75,6 +75,7 @@ class StorageManager(ABC):
                 VALUES (%s, %s, %s, %s, %s, %s)"""
                 expires = datetime.utcfromtimestamp(expires) if expires is not None else expires
                 file_info = (uploader_id, short_link, url, mime_type, expires, privacy)
+                self.db.begin()
                 cursor.execute(insert_query, file_info)
                 self.db.commit()
             except IntegrityError:
