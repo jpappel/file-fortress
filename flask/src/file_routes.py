@@ -8,8 +8,8 @@ file_api = Blueprint('file_api', __name__)
 @file_api.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
                 provide_automatic_options=False)
 def file(short_link):
-    with current_app.config['db'].connection() as conn:
-        manager = current_app.config['storage_manager']
+    with current_app.config['DB'].connection() as conn:
+        manager = current_app.config['STORAGE_MANAGER']
         try:
             rel_path = manager.lookup_link(short_link)
         except FileNotFoundError:
@@ -57,8 +57,8 @@ def upload_file(short_link):
     # reset to beginning of file
     file.seek(0)
 
-    with current_app.config['db'].connection() as conn:
-        manager = current_app.config['storage_manager']
+    with current_app.config['DB'].connection() as conn:
+        manager = current_app.config['STORAGE_MANAGER']
 
         # TODO: change from testing value of system user id
         file_info['uploader_id'] = manager._system_id
@@ -84,7 +84,7 @@ def upload_file(short_link):
 def link_options(short_link):
     allowed_methods = ['HEAD', 'OPTIONS']
 
-    with current_app.config['db'].connection() as conn:
+    with current_app.config['DB'].connection() as conn:
         # query database for short_link
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM files WHERE short_link = %s', short_link)
@@ -104,7 +104,7 @@ def link_options(short_link):
 
 @file_api.route('/api/v1/file/<short_link>/info', methods=['GET'])
 def file_info(short_link):
-    with current_app.config['db'].connection() as conn:
+    with current_app.config['DB'].connection() as conn:
         try:
             cursor = conn.cursor()
             query = """SELECT files.id AS file_id, name AS uploader_username, mime_type, expires, privacy, modified_date, created_date

@@ -3,18 +3,25 @@ from .db import get_db
 from .file_routes import file_api
 from .website_routes import website
 from .StorageManagers import LocalStorageManager
+from .configurations import ProductionConfig
 
 
-app = Flask(__name__, template_folder="./templates", static_folder="./static")
 
-# create database sessionn
-db = get_db()
-app.config['db'] = db
+def create_app(config=None) -> Flask:
+    app = Flask(__name__, template_folder="./templates", static_folder="./static")
 
-# create storage manager
-storage_root = '/mnt/file_storage'
-app.config['storage_manager'] = LocalStorageManager(db, storage_root)
+    if config is None:
+        app.config.from_object(ProductionConfig)
+    else:
+        app.config.from_object(config)
 
-# register blueprints
-app.register_blueprint(file_api)
-app.register_blueprint(website)
+    # register blueprints
+    app.register_blueprint(file_api)
+    app.register_blueprint(website)
+
+    return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)

@@ -10,4 +10,4 @@ COPY . /app
 WORKDIR /app
 
 # Run the application
-CMD [ "gunicorn" , "-w", "4", "-b", "0.0.0.0:8080", "src.app:app"]
+CMD [ "gunicorn" , "-w", "4", "-b", "0.0.0.0:8080", "src.app:create_app()"]
