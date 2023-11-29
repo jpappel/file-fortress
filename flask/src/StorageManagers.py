@@ -10,6 +10,8 @@ from typing import BinaryIO
 from pathlib import Path
 from datetime import datetime
 from pymysql import IntegrityError
+from string import ascii_letters, digits
+from random import choices
 
 
 class StorageManager(ABC):
@@ -30,6 +32,17 @@ class StorageManager(ABC):
     @abstractmethod
     def allocate_url(self, uploader_id: str, filename: str) -> str:
         pass
+
+    def generate_short_link(self,uploader_id:str, length:int=8) -> str:
+        
+        short_link = ''.join(choices(ascii_letters + digits, k=length))
+        file_path = self.root / uploader_id / short_link
+
+        while file_path.exists():
+            short_link = ''.join(choices(ascii_letters + digits, k=length))
+            file_path = self.root / uploader_id / short_link
+        
+        return short_link
 
     def lookup_link(self, short_link: str) -> str:
         """
