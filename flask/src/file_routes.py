@@ -1,18 +1,15 @@
 from flask import Blueprint, request, jsonify, send_file, make_response, current_app
 from .util import get_mime_type
 
-from .StorageManagers import LocalStorageManager
 
 file_api = Blueprint('file_api', __name__)
 
-# TODO: rename db to db_conn or similar
 
 @file_api.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
                 provide_automatic_options=False)
 def file(short_link):
-    # TODO: add manager as app attribute
     with current_app.config['db'].connection() as conn:
-        manager = LocalStorageManager(conn, '/mnt/file_storage')
+        manager = current_app.config['storage_manager']
         try:
             rel_path = manager.lookup_link(short_link)
         except FileNotFoundError:
@@ -23,11 +20,17 @@ def file(short_link):
                 path = manager.cannonical_location(rel_path)
                 return send_file(path)
             case 'DELETE':
-                manager.delete_file(rel_path)
-                conn.begin()
-                cursor = conn.cursor()
-                cursor.execute('DELETE FROM files WHERE short_link = %s', short_link)
-                conn.commit()
+                try:
+                    manager.delete_file(rel_path)
+                    conn.begin()
+                    cursor = conn.cursor()
+                    cursor.execute('DELETE FROM files WHERE short_link = %s', short_link)
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    # TODO: add more descriptive error
+                    return {'error': 'unable to delete resource'}, 404
+
                 return {}, 204
 
 
@@ -55,7 +58,7 @@ def upload_file(short_link):
     file.seek(0)
 
     with current_app.config['db'].connection() as conn:
-        manager = LocalStorageManager(conn, '/mnt/file_storage')
+        manager = current_app.config['storage_manager']
 
         # TODO: change from testing value of system user id
         file_info['uploader_id'] = manager._system_id

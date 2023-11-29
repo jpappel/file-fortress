@@ -17,13 +17,13 @@ class StorageManager(ABC):
     Handles storing, retrieving, and deletion of files and collections.
 
     Attributes:
-        db_conn (): connection to database
+        db (): a database session which connections can be created from
         _system_id (str): UUID of system user in database
     """
 
-    def __init__(self, db_conn):
-        self.db = db_conn
-        with self.db.cursor() as cursor:
+    def __init__(self, db):
+        self.db = db
+        with self.db.connection() as conn, conn.cursor() as cursor:
             cursor.execute('SELECT id FROM users WHERE name = "system"')
             self._system_id = cursor.fetchone()['id']
 
@@ -44,7 +44,7 @@ class StorageManager(ABC):
         Raises:
             FileNotFoundError: if short_link is not found in the database
         """
-        with self.db.cursor() as cursor:
+        with self.db.connection() as conn, conn.cursor() as cursor:
             cursor.execute('SELECT url FROM files WHERE short_link=%s', short_link)
             result = cursor.fetchone()
         if result is None or 'url' not in result:
@@ -69,17 +69,17 @@ class StorageManager(ABC):
         Raises:
             FileExistsError: if the short_link is already in use
         """
-        with self.db.cursor() as cursor:
+        with self.db.connection() as conn, conn.cursor() as cursor:
             try:
                 insert_query = """INSERT INTO files (uploader_id, short_link, url, mime_type, expires, privacy)
                 VALUES (%s, %s, %s, %s, %s, %s)"""
                 expires = datetime.utcfromtimestamp(expires) if expires is not None else expires
                 file_info = (uploader_id, short_link, url, mime_type, expires, privacy)
-                self.db.begin()
+                conn.begin()
                 cursor.execute(insert_query, file_info)
-                self.db.commit()
+                conn.commit()
             except IntegrityError:
-                self.db.rollback()
+                conn.rollback()
                 raise FileExistsError(f"short_link {short_link} is already in use!")
 
     @abstractmethod
@@ -120,12 +120,12 @@ class LocalStorageManager(StorageManager):
     A storage manger that handles local files
 
     Attributes:
-        db_conn (): connection to database
+        db (): a database session which connections can be created from
         _system_id (str): UUID of system user in database
     """
 
-    def __init__(self, db_conn, root_dir: str):
-        super().__init__(db_conn)
+    def __init__(self, db, root_dir: str):
+        super().__init__(db)
         self.root = Path(root_dir)
 
     def allocate_url(self, uploader_id: str, filename: str):
@@ -204,12 +204,12 @@ class S3StorageManager(StorageManager):
     A storage manager for remote storage via S3.
 
     Attributes:
-        db_conn (): connection to database
+        db (): a database session which connections can be created from
         _system_id (str): UUID of system user in database
     """
 
-    def __init__(self, db_conn, aws_credentials):
-        super().__init__(db_conn)
+    def __init__(self, db, aws_credentials):
+        super().__init__(db)
         raise NotImplementedError
 
     def cannonical_uri(self, uri) -> str:
