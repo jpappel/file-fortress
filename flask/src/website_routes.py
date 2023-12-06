@@ -11,8 +11,3 @@ def web_root():
 @website.route('/u/<username>', methods=['GET'])
 def web_get_user(username):
     return render_template('user.html', username=username)
-
-
-@website.route('/<short_link>', methods=['GET'])
-def web_get_file(short_link):
-    return render_template('file.html', short_link=short_link)
