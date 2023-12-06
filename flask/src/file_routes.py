@@ -1,8 +1,14 @@
-from flask import Blueprint, request, jsonify, send_file, make_response, current_app
+from flask import Blueprint, request, jsonify, send_file, make_response, current_app, redirect, url_for
 from .util import get_mime_type
 
 
 file_api = Blueprint('file_api', __name__)
+file_view = Blueprint('files', __name__)
+
+
+@file_view.route('/<short_link>', methods=['GET'])
+def view_file(short_link):
+    return file(short_link)
 
 
 @file_api.route('/api/v1/file/<short_link>', methods=['GET', 'DELETE'],
