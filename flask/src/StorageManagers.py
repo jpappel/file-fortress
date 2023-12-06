@@ -23,9 +23,11 @@ class StorageManager(ABC):
 
     def __init__(self, db):
         self.db = db
-        with self.db.connection() as conn, conn.cursor() as cursor:
+        with self.db.connection() as conn:
+            cursor = conn.cursor()
             cursor.execute('SELECT id FROM users WHERE name = "system"')
             self._system_id = cursor.fetchone()['id']
+            cursor.close()
 
     @abstractmethod
     def allocate_url(self, uploader_id: str, filename: str) -> str:
@@ -44,9 +46,11 @@ class StorageManager(ABC):
         Raises:
             FileNotFoundError: if short_link is not found in the database
         """
-        with self.db.connection() as conn, conn.cursor() as cursor:
+        with self.db.connection() as conn:
+            cursor = conn.cursor()
             cursor.execute('SELECT url FROM files WHERE short_link=%s', short_link)
             result = cursor.fetchone()
+            cursor.close()
         if result is None or 'url' not in result:
             raise FileNotFoundError(f"Cannot resolve short_link: {short_link}")
         return result['url']
@@ -69,7 +73,8 @@ class StorageManager(ABC):
         Raises:
             FileExistsError: if the short_link is already in use
         """
-        with self.db.connection() as conn, conn.cursor() as cursor:
+        with self.db.connection() as conn:
+            cursor = conn.cursor()
             try:
                 insert_query = """INSERT INTO files (uploader_id, short_link, url, mime_type, expires, privacy)
                 VALUES (%s, %s, %s, %s, %s, %s)"""
@@ -78,7 +83,9 @@ class StorageManager(ABC):
                 conn.begin()
                 cursor.execute(insert_query, file_info)
                 conn.commit()
+                cursor.close()
             except IntegrityError:
+                cursor.close()
                 conn.rollback()
                 raise FileExistsError(f"short_link {short_link} is already in use!")
 
