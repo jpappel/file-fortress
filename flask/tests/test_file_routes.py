@@ -25,8 +25,6 @@ def client(app):
         yield client
 
 
-
-
 def test_file_not_found(app, client, mocker):
     # Mock the database connection
     mocker.patch(
@@ -42,14 +40,13 @@ def test_file_not_found(app, client, mocker):
     assert response.json == {"error": "file not found"}
 
 
-def test_delete_non_existing_file(app, client):
+def test_delete_non_existing_file(client):
     response = client.delete("/api/v1/file/test")
     assert response.status_code == 404
     assert {"error": "file not found"} == response.json
 
 
-def test_upload_missing_file(app, client):
-    app.config["DB"] = db_returns()
+def test_upload_missing_file(client):
     response = client.post("/api/v1/file/test.png")
     assert response.status_code == 400
     assert response.json == {"error": "no file provided"}
@@ -62,7 +59,6 @@ def test_upload_file(client, tmpdir):
 
     # setup request
     files = {"file": (p.open("rb"),"test.txt")}
-    params = {"privacy": "public", "expires": 1700824992}
 
     response = client.post(
         "/api/v1/file/test", data=files, content_type="multipart/form-data"
@@ -74,8 +70,8 @@ def test_upload_file(client, tmpdir):
     os.remove('0/test.txt')
     os.rmdir('0')
 
-# @pytest.mark.skip(reason="not sure how to make this mock yet")
-def test_file_found(app, client, mocker):
+
+def test_file_found(app, client):
     # mock the value from get_file
     expected_return = {
         "id": 1,

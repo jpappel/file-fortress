@@ -29,6 +29,7 @@ def test_allocate_url(local_storage_manager):
     expected_url = 'test/test.png'
     assert real_url == expected_url
 
+
 def test_allocate_url_with_exisiting_file():
     mock = Mock()
     mock.side_effect = [True, False]  # the first call will return True, and the second will return False
