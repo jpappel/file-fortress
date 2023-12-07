@@ -3,62 +3,42 @@ import sqlite3
 from src.StorageManagers import LocalStorageManager
 from unittest.mock import Mock, patch, mock_open
 
+class db_returns():
+    def __init__(self, val: dict = {}):
+        val['id'] = 0
+        self.val = val
 
-class TestDB:
-    def __init__(self):
-        self.conn = sqlite3.connect(':memory:')
-        self.conn.row_factory = sqlite3.Row
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        CREATE TABLE users (
-        id INT AUTO_INCREMENT,
-        name VARCHAR(31) NOT NULL,
-        upload_limit INT UNSIGNED, -- NULL is no limit
-        collection_limit INT UNSIGNED DEFAULT 31,
-        collection_size_limit INT UNSIGNED DEFAULT 15,
-        PRIMARY KEY (id),
-        CONSTRAINT check_positive_upload_limit
-            CHECK (upload_limit > 0 OR upload_limit IS NULL),
-        CONSTRAINT check_positive_collection_limit
-            CHECK (collection_limit > 0 OR collection_limit IS NULL),
-        CONSTRAINT check_positive_collection_size_limit
-            CHECK (collection_size_limit > 0 OR collection_size_limit IS NULL)
-        )''')
-        self.conn.commit()
-        cursor.execute('''
-        CREATE TABLE files (
-        id INT AUTO_INCREMENT,
-        uploader_id INT,
-        short_link VARCHAR(255) UNIQUE NOT NULL,
-        url VARCHAR(255),
-        mime_type VARCHAR(31),
-        expires DATETIME,
-        privacy VARCHAR(7) DEFAULT 'public' NOT NULL,
-        modified_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (uploader_id) REFERENCES users(id)
-        )''')
-        self.conn.commit()
-        cursor.execute('INSERT INTO USERS (name, collection_limit, collection_size_limit) VALUES ("system", NULL, NULL);')
-        self.conn.commit()
-        # base = '../../mariadb/'
-        # files = ('init.sql', 'procedures.sql', 'default_files.sql')
-        # for path in map(lambda file: base + file, files):
-        #     with open(path, 'r') as f:
-        #         contents = f.read()
-        #
-        #     self.conn.executescript(contents)
-        #
-        #     self.conn.commit()
+    def cursor(self):
+        return self
 
-    def connection(self) -> sqlite3.Connection:
-        return self.conn
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return None
+
+    def connection(self, *args):
+        return self
+
+    def execute(self, query, *args):
+        return None
+
+    def fetchone(self):
+        return self.val
+    
+    def close(self):
+        pass
+    
+class LocalStorageManagerTest(LocalStorageManager):
+    def __init__(self, val: dict = {}):
+        super().__init__(db_returns(val), "")
+    def lookup_link(self, short_link: str) -> str:
+        return 
 
 
 @pytest.fixture
 def db_ses():
-    return TestDB()
+    return db_returns()
 
 
 @pytest.fixture

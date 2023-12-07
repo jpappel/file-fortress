@@ -67,7 +67,7 @@ def upload_file(short_link):
         manager = current_app.config['STORAGE_MANAGER']
 
         # TODO: change from testing value of system user id
-        file_info['uploader_id'] = manager._system_id
+        file_info['uploader_id'] = str(manager._system_id)
 
         try:
             file_info['expires'] = int(request.args.get('expires'))
