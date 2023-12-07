@@ -10,6 +10,9 @@ The program sends requests and uploads to http://filefortress.xyz by default, un
 ```bash
 file-fortress [command] [arguments] --flags
 ```
+## Requirements
+
+Go 1.16 or higher
 
 ## Running
 
@@ -42,14 +45,18 @@ Uploads a file to the File Fortress instance at the given URL. If no URL is prov
 
 The shortlink will default to the filename if one is not provided.
 
+## Delete a File
+
+```bash
+file-fortress delete [shortlink] --url [url]
+```
+
+Deletes a file from File Fortress if it exists.
+
+
 ## Download a File
 
 TODO
-
-## Delete a File
-
-TODO
-
 
 ## Resources Used
 - [Cobra CLI](https://cobra.dev)

@@ -3,42 +3,77 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
-
-	"github.com/spf13/cobra"
+	"strconv"
+	"strings"
 )
 
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
-	Use:   "upload [FILE] --url [URL]",
+	Use:   "upload [file] --url [url] --shortlink [shortlink]",
 	Short: "Uploads a file to File Fortress",
-	Long: `Upload a file to File Fortress, , or a given instance if a url is specified.:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		// make sure the user inputs a file
 		if len(args) < 1 {
 			log.Fatalf("Error: no file specified")
 		}
+
+		// Make sure the file exists as well
+		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
+			log.Fatalf("Error: file %s does not exist", args[0])
+		}
+
+		// If the path starts with a tilde, replace it with the home directory
+		if strings.HasPrefix(args[0], "~/") {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				log.Fatal(err)
+			}
+			args[0] = filepath.Join(home, args[0][2:])
+		}
+
 		url, err := cmd.Flags().GetString("url")
 		if err != nil {
 			log.Fatalf("Error getting 'url' flag: %v", err)
 		}
 
-		file, err := cmd.Flags().GetString("file")
+		shortlink, err := cmd.Flags().GetString("shortlink")
+		if err != nil {
+			log.Fatalf("Error getting 'shortlink' flag: %v", err)
+		}
+		if shortlink == "" {
+			// shortlink will be the filename if not specified
+			shortlink = filepath.Base(args[0])
+		}
+		url += "/api/v1/file/" + shortlink
+
+		if !containsHTTP(url) {
+			url = "http://" + url
+		}
+
+		file, err := filepath.Abs(args[0])
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		// Open the file
 		f, err := os.Open(file)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer f.Close()
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}(f)
 
 		// Create a buffer to store the multipart form data
 		var b bytes.Buffer
@@ -63,7 +98,7 @@ to quickly create a Cobra application.`,
 		}
 
 		// Create a new request with the form data
-		req, err := http.NewRequest("POST", url+"/api/v1/file/"+file, &b)
+		req, err := http.NewRequest("POST", url, &b)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -77,28 +112,25 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer resp.Body.Close()
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}(resp.Body)
 
-		// Read the response
-		bodyText, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
+		if resp.StatusCode == 200 {
+			fmt.Println("File " + args[0] + " uploaded successfully!")
+			fmt.Println("Link: " + url)
+		} else {
+			errorMessage := "Error " + strconv.Itoa(resp.StatusCode) + ": file download failed"
+			fmt.Println(errorMessage)
 		}
-		fmt.Printf("%s\n", bodyText)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// uploadCmd.PersistentFlags().String("foo", "", "A help for foo")
-	uploadCmd.PersistentFlags().String("url", "https://filefortress.xyz", "The url of the File Fortress instance to upload to")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// uploadCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	uploadCmd.PersistentFlags().String("shortlink", "", `The shortlink to assign on the instance`)
 }
