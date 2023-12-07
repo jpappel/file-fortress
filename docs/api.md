@@ -15,12 +15,13 @@ curl -X GET https://filefortress.xyz/api/v1/file/<short_link>
 ## Upload a file
 
 ```
-PUT /api/v1/file<short_link>
+POST /api/v1/file/<short_link>
 ```
 
-Not implemented
-
 ### Curl Command
+```
+curl -X POST https://filefortress.xyz/api/v1/file/<short_link> -F "file=@<PATH>;type=<MIME_TYPE>"
+```
 
 ## Delete a file
 

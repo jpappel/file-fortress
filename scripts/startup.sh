@@ -1,5 +1,5 @@
 # install git and docker in the instance
-sudo dnf in docker git
+sudo dnf in docker git -y
 
 # enable the docker daemon
 sudo systemctl enable --now docker
@@ -7,6 +7,7 @@ sudo systemctl enable --now docker
 # add user to the "docker" group, and start a new shell with the permissions instantiated
 sudo usermod -aG docker ec2-user
 id ec2-user # reloads group assignments without relogging
+newgrp docker # create the group
 
 # install docker compose (which isn't included)
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}

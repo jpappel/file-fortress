@@ -39,7 +39,7 @@ def file(short_link):
 
                 return {}, 204
 
-
+@file_api.route('/api/v1/file', methods=['POST'], provide_automatic_options=False)
 @file_api.route('/api/v1/file/<short_link>', methods=['POST'],
                 provide_automatic_options=False)
 def upload_file(short_link):
@@ -52,6 +52,10 @@ def upload_file(short_link):
 
     if file.filename == '':
         return jsonify({'error': 'empty file provided'}), 400
+    
+    manager = LocalStorageManager(get_db(), '/mnt/file_storage')
+    if short_link is None:
+        short_link = manager.generate_short_link()
 
     filename = file.filename
     file_info = {
@@ -65,6 +69,7 @@ def upload_file(short_link):
 
     with current_app.config['DB'].connection() as conn:
         manager = current_app.config['STORAGE_MANAGER']
+
 
         # TODO: change from testing value of system user id
         file_info['uploader_id'] = str(manager._system_id)
