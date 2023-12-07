@@ -53,16 +53,6 @@ def upload_file(short_link):
     if file.filename == '':
         return jsonify({'error': 'empty file provided'}), 400
     
-    manager = LocalStorageManager(get_db(), '/mnt/file_storage')
-    if short_link is None:
-        short_link = manager.generate_short_link()
-
-    filename = file.filename
-    file_info = {
-            'short_link': short_link,
-            'mime_type': get_mime_type(file.read(3072)),
-            'privacy': request.args.get('privacy', 'public'),
-            }
 
     # reset to beginning of file
     file.seek(0)
@@ -70,6 +60,15 @@ def upload_file(short_link):
     with current_app.config['DB'].connection() as conn:
         manager = current_app.config['STORAGE_MANAGER']
 
+        if short_link is None:
+            short_link = manager.generate_short_link()
+
+        filename = file.filename
+        file_info = {
+                'short_link': short_link,
+                'mime_type': get_mime_type(file.read(3072)),
+                'privacy': request.args.get('privacy', 'public'),
+                }
 
         # TODO: change from testing value of system user id
         file_info['uploader_id'] = str(manager._system_id)
