@@ -23,4 +23,4 @@ def client(app):
 def test_main(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.data == open('../src/templates/index.html', 'rb').read().strip()
+    assert response.data == open('./src/templates/index.html', 'rb').read().strip()
