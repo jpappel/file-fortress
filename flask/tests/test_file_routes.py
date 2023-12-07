@@ -5,12 +5,13 @@ from flask import Flask, current_app
 from pymysql import Timestamp
 import pytest
 import uuid
-from src.StorageManagers import LocalStorageManager
+
 
 from src import create_app
 from src.configurations import TestConfig
 from src.file_routes import file_api
 
+from .classes import db_returns, LocalStorageManagerTest
 
 @pytest.fixture
 def app():
@@ -28,40 +29,6 @@ def client(app):
         yield client
 
 
-class db_returns:
-    def __init__(self, val: dict = {}):
-        val["id"] = 0
-        self.val = val
-
-    def cursor(self):
-        return self
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        return None
-
-    def connection(self, *args):
-        return self
-
-    def execute(self, query, *args):
-        return None
-
-    def fetchone(self):
-        return self.val
-
-    def close(self):
-        pass
-    def begin(self):
-        pass
-    def commit(self):
-        pass
-
-
-class LocalStorageManagerTest(LocalStorageManager):
-    def __init__(self, val: dict = {}):
-        super().__init__(db_returns(val), "")
 
 
 def test_file_not_found(app, client, mocker):
@@ -73,20 +40,11 @@ def test_file_not_found(app, client, mocker):
 
     # Mock the LocalStorageManager instantiation to use the mocked database connection
     # with patch('src.StorageManagers.LocalStorageManager.__init__', lambda x, db: None):
-    db_mock = db_returns()
     with app.app_context():  # Set up the application context
         response = client.get("/api/v1/file/non_existent_file")
 
     assert response.status_code == 404
     assert response.json == {"error": "file not found"}
-
-
-# def test_file_not_found(client, mocker):
-#     # mock the value from get_file
-#     app.DB = mocker.MagicMock()
-#     response = client.get("/api/v1/file/test")
-#     assert response.status_code == 404
-#     assert {"error": "file not found"} == response.json
 
 
 def test_delete_non_existing_file(app, client):
