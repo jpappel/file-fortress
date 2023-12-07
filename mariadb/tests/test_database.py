@@ -79,9 +79,6 @@ def test_uploader_gets_owner_permissions(connection, cursor):
     cursor.execute('SELECT file_id, user_id FROM permissions WHERE permission = "owner"')
     file_owners = dict(cursor.fetchall())
 
-
-    cursor.execute('SELECT * FROM permissions')
-
     assert file_uploaders == file_owners, "file uploaders were not given file owner permissions"
 
     connection.rollback()
