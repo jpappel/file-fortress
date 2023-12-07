@@ -10,5 +10,8 @@ RUN apt install -y libmagic1
 COPY . /app
 WORKDIR /app
 
+# Generate a secret key for the app
+# RUN python3 -c 'import secrets; print(secres.token_hex())' >> /app/.env
+
 # Run the application
-CMD [ "gunicorn" , "-w", "4", "-b", "0.0.0.0:8080", "src.app:app"]
+CMD [ "gunicorn" , "-w", "4", "-b", "0.0.0.0:8080", "src:create_app()"]
