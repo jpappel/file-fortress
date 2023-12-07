@@ -1,8 +1,6 @@
 import pytest
 from flask import Flask
-from src import create_app
 
-from src.configurations import TestConfig
 from src.website_routes import website
 
 

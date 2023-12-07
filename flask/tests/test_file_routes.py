@@ -1,14 +1,10 @@
 import datetime
 import os
-from unittest.mock import Mock, patch
-from flask import Flask, current_app
-from pymysql import Timestamp
+from flask import Flask
 import pytest
 import uuid
 
 
-from src import create_app
-from src.configurations import TestConfig
 from src.file_routes import file_api
 
 from .classes import db_returns, LocalStorageManagerTest
@@ -39,7 +35,6 @@ def test_file_not_found(app, client, mocker):
     )
 
     # Mock the LocalStorageManager instantiation to use the mocked database connection
-    # with patch('src.StorageManagers.LocalStorageManager.__init__', lambda x, db: None):
     with app.app_context():  # Set up the application context
         response = client.get("/api/v1/file/non_existent_file")
 
@@ -48,22 +43,19 @@ def test_file_not_found(app, client, mocker):
 
 
 def test_delete_non_existing_file(app, client):
-    with app.app_context():  # Set up the application context
-        response = client.delete("/api/v1/file/test")
+    response = client.delete("/api/v1/file/test")
     assert response.status_code == 404
     assert {"error": "file not found"} == response.json
 
 
-def test_upload_missing_file(app, client, mocker):
-    with app.app_context():
-        app.config["DB"] = db_returns()
+def test_upload_missing_file(app, client):
+    app.config["DB"] = db_returns()
     response = client.post("/api/v1/file/test.png")
     assert response.status_code == 400
     assert response.json == {"error": "no file provided"}
 
 
-# @pytest.mark.skip(reason="storage manager and db not mocked")
-def test_upload_file(client, mocker, tmpdir):
+def test_upload_file(client, tmpdir):
     # create dummy test file
     p = tmpdir.mkdir("test") / "test.txt"
     p.write("testing body")
@@ -78,6 +70,7 @@ def test_upload_file(client, mocker, tmpdir):
 
     assert response.status_code == 200
     assert response.json == {"success": "file uploaded succesfully"}
+    # this part is annoying, it hurts me
     os.remove('0/test.txt')
     os.rmdir('0')
 
@@ -95,8 +88,7 @@ def test_file_found(app, client, mocker):
         "modified_date": datetime.datetime.now(),
         "created_date": datetime.datetime.now(),
     }
-    with app.app_context():  # Set up the application context
-        app.config["DB"] = db_returns(expected_return)
+    app.config["DB"] = db_returns(expected_return)
     response = client.get("/api/v1/file/test.png/info")
     print(response)
     assert response.status_code == 200

@@ -1,7 +1,6 @@
 import pytest
-import sqlite3
 from src.StorageManagers import LocalStorageManager
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, patch
 from .classes import db_returns, LocalStorageManagerTest
 
 
