@@ -1,11 +1,14 @@
 CREATE TABLE users (
     id UUID DEFAULT UUID(),
-    name VARCHAR(31) NOT NULL,
+    name VARCHAR(32) NOT NULL,
     -- email VARCHAR(63), -- not needed atm
     upload_limit INT UNSIGNED, -- NULL is no limit
-    collection_limit INT UNSIGNED DEFAULT 31,
-    collection_size_limit INT UNSIGNED DEFAULT 15,
+    collection_limit INT UNSIGNED DEFAULT 32,
+    collection_size_limit INT UNSIGNED DEFAULT 16,
     -- AUTH STUFF
+    username VARCHAR(32) UNIQUE NOT NULL,
+    hash VARCHAR(128) NOT NULL,
+    salt VARCHAR(32) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT check_positive_upload_limit
         CHECK (upload_limit > 0 OR upload_limit IS NULL),
@@ -18,9 +21,9 @@ CREATE TABLE users (
 CREATE TABLE files (
     id INT UNSIGNED AUTO_INCREMENT,
     uploader_id UUID,
-    short_link VARCHAR(255) UNIQUE NOT NULL,
-    url VARCHAR(255),
-    mime_type VARCHAR(31),
+    short_link VARCHAR(256) UNIQUE NOT NULL,
+    url VARCHAR(256),
+    mime_type VARCHAR(32),
     expires DATETIME,
     privacy ENUM('public', 'share', 'private') DEFAULT 'public' NOT NULL,
     modified_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
@@ -49,10 +52,10 @@ CREATE TABLE permissions (
 
 CREATE TABLE collections (
     id INT UNSIGNED AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(256) NOT NULL,
     creator_id UUID,
-    short_link VARCHAR(255) UNIQUE NOT NULL,
-    url VARCHAR(255) NOT NULL,
+    short_link VARCHAR(256) UNIQUE NOT NULL,
+    url VARCHAR(256) NOT NULL,
     privacy ENUM('public', 'share', 'private') DEFAULT 'public' NOT NULL,
     expires DATETIME,
     modified_date DATETIME DEFAULT NOW() ON UPDATE NOW(),
