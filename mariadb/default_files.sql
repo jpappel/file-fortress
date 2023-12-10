@@ -1,4 +1,4 @@
-INSERT INTO users (name, upload_limit, collection_limit, collection_size_limt)
+INSERT INTO users (name, upload_limit, collection_limit, collection_size_limit)
 VALUES ("system",  NULL, NULL, NULL);
 
 SELECT id INTO @system FROM users WHERE name = "system";
