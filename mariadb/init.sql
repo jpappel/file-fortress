@@ -6,9 +6,9 @@ CREATE TABLE users (
     collection_limit INT UNSIGNED DEFAULT 32,
     collection_size_limit INT UNSIGNED DEFAULT 16,
     -- AUTH STUFF
-    username VARCHAR(32) UNIQUE NOT NULL,
-    hash VARCHAR(128) NOT NULL,
-    salt VARCHAR(32) NOT NULL,
+    username VARCHAR(32) UNIQUE,
+    hash VARCHAR(256),
+    salt VARCHAR(32),
     PRIMARY KEY (id),
     CONSTRAINT check_positive_upload_limit
         CHECK (upload_limit > 0 OR upload_limit IS NULL),
