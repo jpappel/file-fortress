@@ -1,5 +1,5 @@
-from .db import get_db
-from .StorageManagers import LocalStorageManager
+from src.db import get_db
+from src.StorageManagers import LocalStorageManager
 
 
 class Config(object):

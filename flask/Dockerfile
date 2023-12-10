@@ -1,5 +1,7 @@
 FROM python:3.10-slim
 
+ENV PYTHONPATH /app
+
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt

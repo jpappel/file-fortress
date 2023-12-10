@@ -1,15 +1,15 @@
 from flask import Flask
-from .file_routes import file_api, file_view
-from .website_routes import website
-from .users import users, login_manager
-from .configurations import Config
+from src.file_routes import file_api, file_view
+from src.website_routes import website
+from src.users import users, login_manager
+from src.configurations import Config
 
 
 def create_app(config: Config = None) -> Flask:
     app = Flask(__name__, template_folder="./templates", static_folder="./static")
 
     if config is None:
-        from .configurations import production_config
+        from src.configurations import production_config
         app.config.from_object(production_config())
     else:
         app.config.from_object(config)
@@ -28,4 +28,4 @@ def create_app(config: Config = None) -> Flask:
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True, port=8080)

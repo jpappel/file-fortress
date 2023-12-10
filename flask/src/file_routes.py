@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, send_file, make_response, current_app, redirect, url_for
-from .util import get_mime_type
+from src.util import get_mime_type
 
 
 file_api = Blueprint('file_api', __name__)
