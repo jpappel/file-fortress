@@ -54,7 +54,7 @@ var uploadCmd = &cobra.Command{
 		}
 		url += "/api/v1/file/" + shortlink
 
-		if !containsHTTP(url) {
+		if !ContainsHTTP(url) {
 			url = "http://" + url
 		}
 

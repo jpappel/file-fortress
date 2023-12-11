@@ -26,7 +26,7 @@ var removeCmd = &cobra.Command{
 
 		url += "/api/v1/file/" + args[0]
 
-		if !containsHTTP(url) {
+		if !ContainsHTTP(url) {
 			url = "http://" + url
 		}
 
