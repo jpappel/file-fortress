@@ -54,39 +54,37 @@ def upload_file(short_link):
         return jsonify({'error': 'empty file provided'}), 400
     
 
-    # reset to beginning of file
+    manager = current_app.config['STORAGE_MANAGER']
+
+    if short_link is None:
+        short_link = manager.generate_short_link()
+
+    filename = file.filename
+    file_info = {
+            'short_link': short_link,
+            'mime_type': get_mime_type(file.read(3072)),
+            'privacy': request.args.get('privacy', 'public'),
+            }
+
     file.seek(0)
 
-    with current_app.config['DB'].connection() as conn:
-        manager = current_app.config['STORAGE_MANAGER']
+    # TODO: change from testing value of system user id
+    file_info['uploader_id'] = str(manager._system_id)
 
-        if short_link is None:
-            short_link = manager.generate_short_link()
+    try:
+        file_info['expires'] = int(request.args.get('expires'))
+    except (ValueError, TypeError):
+        file_info['expires'] = None
 
-        filename = file.filename
-        file_info = {
-                'short_link': short_link,
-                'mime_type': get_mime_type(file.read(3072)),
-                'privacy': request.args.get('privacy', 'public'),
-                }
+    file_info['url'] = manager.allocate_url(file_info['uploader_id'], filename)
 
-        # TODO: change from testing value of system user id
-        file_info['uploader_id'] = str(manager._system_id)
+    # create link within database
+    manager.create_link(**file_info)
 
-        try:
-            file_info['expires'] = int(request.args.get('expires'))
-        except (ValueError, TypeError):
-            file_info['expires'] = None
+    # save file
+    manager.push_file(file.stream, file_info['url'])
 
-        file_info['url'] = manager.allocate_url(file_info['uploader_id'], filename)
-
-        # create link within database
-        manager.create_link(**file_info)
-
-        # save file
-        manager.push_file(file.stream, file_info['url'])
-
-        return jsonify({'success': 'file uploaded succesfully'}), 200
+    return jsonify({'success': 'file uploaded succesfully'}), 200
 
 
 @file_api.route('/api/v1/file/<short_link>', methods=['OPTIONS'],
