@@ -16,7 +16,7 @@ import (
 
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
-	Use:   "upload [file] --url [url] --shortlink [shortlink]",
+	Use:   "upload --url [url] --shortlink [shortlink] [file]",
 	Short: "Uploads a file to File Fortress",
 	Run: func(cmd *cobra.Command, args []string) {
 
