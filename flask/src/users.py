@@ -29,6 +29,7 @@ def user_loader(username):
         user_info = cursor.fetchone()
     return User(**user_info) if user_info else None
 
+
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     match request.method:
@@ -60,10 +61,8 @@ def register():
                     return redirect(url_for('users.login'))
                 except Exception:
                     conn.rollback()
-                    # # TODO: reload page, prompt about invalid
 
                 return render_template('register.html')
-
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -87,7 +86,8 @@ def login():
                     user_info['password_hash'], password + user_info['salt']):
                 user = User(**user_info)
                 login_user(user)
-                return render_template('upload.html')
+                return render_template('index.html')
+                # return render_template('upload.html')
 
             return 'Bad Login'
 

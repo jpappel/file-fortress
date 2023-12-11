@@ -8,10 +8,18 @@
   <body>
       <header>
           <a href="https://github.com/cs298-398f23/file-fortress">GitHub Repo</a>
-          <a href="login">Login</a>
+          {% if current_user.is_authenticated %}
+          <p>Hi {{ current_user.username }}!</p>
+          <a href="{{ url_for('users.logout') }}">Logout</a>
+          {% else %}
+          <a href="/login">Login</a>
+          {% endif %}
       </header>
       <main>
         Hello! Welcome to File Fortress
+        {% if current_user.is_authenticated %}
+        <a href="/upload"><button>Upload</button></a>
+        {% endif %}
       </main>
   </body>
 </html>
