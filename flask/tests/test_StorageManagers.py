@@ -35,4 +35,4 @@ def test_allocate_url_with_exisiting_file():
     mock.side_effect = [True, False]  # the first call will return True, and the second will return False
     with patch('src.StorageManagers.Path.exists', mock):
         manager = LocalStorageManagerTest()
-        assert manager.allocate_url('test', 'test.png') == 'test/test.png_1'
+        assert manager.allocate_url('test', 'test.png') == 'test_1/test.png'
