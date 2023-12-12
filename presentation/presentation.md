@@ -6,18 +6,19 @@ author:
 - "David Marrero"
 ---
 
+![](http://filefortress.xyz/logo-inverted){width=500px, height=500}
 <!-- TODO: include logo-->
 
-## File Hosting
+# File Hosting
 
 ::: {.flex}
 
 :::: {.col}
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Imgur_logo.svg/640px-Imgur_logo.svg.png){width=420px}
+![](http://filefortress.xyz/imgur){width=420px, height=100}
 ::::
 
 :::: {.col}
-![](https://img.vpnclub.cc/content/zh/2018/08/ImgBB-Logo.jpg){width=420px} 
+![](http://filefortress.xyz/imgbb){width=420px, height=200} 
 ::::
 
 :::
@@ -30,9 +31,10 @@ Owen
 * describe problems with existing solutions
 :::
 
-## Architecture
+# Architecture
 
 <!-- TODO: include updated diagram -->
+![](http://filefortress.xyz/diagram){width=820px, height=400} 
 
 ::: notes
 JP
@@ -44,9 +46,11 @@ JP
 * flask backend, connects directly mariadb container and block storage volume
 :::
 
-## Deployment
+
+# Demo
 
 <!-- TODO: show docker image -->
+![](http://filefortress.xyz/docker){width=820px, height=400} 
 
 . . .
 
@@ -65,30 +69,36 @@ JP
     * this is to avoid having to transfer our https certificates
 :::
 
-## Interfaces
+# Interfaces
 
-### Web
+## Web
+<iframe data-src="http://filefortress.xyz"></iframe>
 
-### API
+## API
 
+```
+curl -X GET https://filefortress.xyz/api/v1/file/<short_link>
+curl -X POST https://filefortress.xyz/api/v1/file/<short_link> -F "file=@<PATH>;type=<MIME_TYPE>"
+curl -X DELETE https://filefortress.xyz/api/v1/file/<short_link>
+```
 <!-- TODO: show a list of functioning endpoints -->
 
-### CLI
+## CLI
 
-## Demo
+# Demo
 
-## GitHub Workflows
+# GitHub Workflows
 
-![](./I_love_tests.png)
+![](http://filefortress.xyz/i_love_tests)
 
 ::: notes
 Owen
 
 :::
 
-## 
+# 
 
-![](https://logos-download.com/wp-content/uploads/2016/09/Nginx_logo.png)
+![](http://filefortress.xyz/nginx)
 
 ::: notes
 JP
@@ -102,16 +112,16 @@ JP
     * faster serving of static files
 :::
 
-## HTTPS
+# HTTPS
 
-![](https://teddycorp.net/wp-content/uploads/2021/08/CERTBOT-Logo.png)
+![](http://filefortress.xyz/certbot)
 
-## Lessons Learned
+# Lessons Learned
 
 * test, test, test!
 * mocking is difficult all the times
 
-## Future Work
+# Future Work
 
 * authentication
     * privacy settings
