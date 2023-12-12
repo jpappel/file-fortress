@@ -7,7 +7,6 @@ author:
 ---
 
 ![](http://filefortress.xyz/logo-inverted){width=500px, height=500}
-<!-- TODO: include logo-->
 
 # File Hosting
 
@@ -47,10 +46,9 @@ JP
 :::
 
 
-# Demo
+# Deployment
 
-<!-- TODO: show docker image -->
-![](http://filefortress.xyz/docker){width=820px, height=400} 
+![](http://filefortress.xyz/docker){width=820px, height=300} 
 
 . . .
 
@@ -77,15 +75,18 @@ JP
 ## API
 
 ```
-curl -X GET https://filefortress.xyz/api/v1/file/<short_link>
-curl -X POST https://filefortress.xyz/api/v1/file/<short_link> -F "file=@<PATH>;type=<MIME_TYPE>"
-curl -X DELETE https://filefortress.xyz/api/v1/file/<short_link>
+GET /api/v1/file/<short_link>
+GET /api/v1/file/<short_link>/info
+OPTIONS /api/v1/file/<short_link>
+POST /api/v1/file/<short_link>
+DELETE /api/v1/file/<short_link>
 ```
-<!-- TODO: show a list of functioning endpoints -->
 
 ## CLI
 
 # Demo
+
+<img alt="Picture of the Class" src="http://filefortress.xyz/class"></img>
 
 # GitHub Workflows
 
@@ -112,18 +113,17 @@ JP
     * faster serving of static files
 :::
 
-# HTTPS
-
-![](http://filefortress.xyz/certbot)
-
 # Lessons Learned
 
 * test, test, test!
-* mocking is difficult all the times
+* mocking correctly is difficult
 
 # Future Work
 
+::: incremental
 * authentication
     * privacy settings
 * S3/Object Storage
+* HTTPS
 * collections
+:::
