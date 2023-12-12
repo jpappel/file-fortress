@@ -70,7 +70,7 @@ JP
 # Interfaces
 
 ## Web
-<iframe data-src="http://filefortress.xyz"></iframe>
+<iframe data-src="http://filefortress.xyz" height="500px" width="700px"></iframe>
 
 ## API
 
@@ -85,8 +85,8 @@ DELETE /api/v1/file/<short_link>
 ## CLI
 
 # Demo
-
 <img alt="Picture of the Class" src="http://filefortress.xyz/class"></img>
+
 
 # GitHub Workflows
 
