@@ -155,7 +155,7 @@ class LocalStorageManager(StorageManager):
         i = 0
         while file_path.exists():
             i += 1
-            file_path = self.root / uploader_id / f'{stem}_{i}.{suffix}'
+            file_path = self.root / uploader_id / f'{stem}_{i}{suffix}'
 
         return str(file_path.relative_to(self.root))
 
