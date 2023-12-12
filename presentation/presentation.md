@@ -6,7 +6,9 @@ author:
 - "David Marrero"
 ---
 
-# File Hosting
+<!-- TODO: include logo-->
+
+## File Hosting
 
 ::: {.flex}
 
@@ -20,27 +22,98 @@ author:
 
 :::
 
-# Architecture
+::: notes
+Owen
 
-# Docker Compose
+* describe problem
+* describe existing solutions (imgur, imgbb, etc)
+* describe problems with existing solutions
+:::
 
-# Interfaces
+## Architecture
 
-## Web
+<!-- TODO: include updated diagram -->
 
-## API
+::: notes
+JP
 
-## CLI
+* this application is relatively portable
+* everything is running in a docker container
+* client requests hit nginx which redirects as necessary
+* gunicorn used as wsgi server
+* flask backend, connects directly mariadb container and block storage volume
+:::
 
-# Demo
+## Deployment
 
-# GitHub Workflows
+<!-- TODO: show docker image -->
 
-## Tests
+. . .
 
-# Nginx
+```bash
+docker compose up -d
+docker compose down -v
+```
 
-# HTTPS
+::: notes
+JP
 
-# Lessons Learned
+* you may wonder how we manage deployment with a stack as seen on the slide prior
+* docker compose allows us to start and stop our application with a single command
+* in repo a script is provided to deploy on an ec2 instances running amazon linux
+* for today's demo we are running on one of owen's machines
+    * this is to avoid having to transfer our https certificates
+:::
 
+## Interfaces
+
+### Web
+
+### API
+
+<!-- TODO: show a list of functioning endpoints -->
+
+### CLI
+
+## Demo
+
+## GitHub Workflows
+
+![](./I_love_tests.png)
+
+::: notes
+Owen
+
+:::
+
+## 
+
+![](https://logos-download.com/wp-content/uploads/2016/09/Nginx_logo.png)
+
+::: notes
+JP
+
+* a way that our architecture differs from other groups is Nginx
+* nginx is a reverse proxy and web server known for its speed
+* by placing nginx at the edge of our network we can change internal network interfaces without affecting the client
+* additionally nginx provides additional features such as
+    * limiting upload size
+    * automatically redirecting http traffic to https
+    * faster serving of static files
+:::
+
+## HTTPS
+
+![](https://teddycorp.net/wp-content/uploads/2021/08/CERTBOT-Logo.png)
+
+## Lessons Learned
+
+* test, test, test!
+* mocking is difficult all the times
+
+## Future Work
+
+* authentication
+    * privacy settings
+* S3/Object Storage
+* collections
