@@ -10,11 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "file-fortress",
 	Short: "File Fortress CLI",
-	Long: `A command-line tool for interacting with File Fortress.:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `A command-line tool for interacting with File Fortress.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
