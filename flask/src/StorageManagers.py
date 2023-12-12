@@ -150,10 +150,12 @@ class LocalStorageManager(StorageManager):
 
     def allocate_url(self, uploader_id: str, filename: str):
         file_path = self.root / uploader_id / filename
+        stem = file_path.stem
+        suffix = file_path.suffix
         i = 0
         while file_path.exists():
             i += 1
-            file_path = self.root / uploader_id / f'{filename}_{i}'
+            file_path = self.root / uploader_id / f'{stem}_{i}.{suffix}'
 
         return str(file_path.relative_to(self.root))
 
